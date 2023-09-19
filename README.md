@@ -1,4 +1,4 @@
-[diagram.png](https://github.com/labs404/jay-labs-exercise-instagram-data-modeling/blob/master/diagram.png?raw=true)
+![diagram.png](https://github.com/labs404/jay-labs-exercise-instagram-data-modeling/blob/master/diagram.png?raw=true)
 <!--hide-->
 # Create the database model for Instagram
 <!--endhide-->
