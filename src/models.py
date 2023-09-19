@@ -7,26 +7,112 @@ from eralchemy2 import render_er
 
 Base = declarative_base()
 
-class Person(Base):
-    __tablename__ = 'person'
-    # Here we define columns for the table person
-    # Notice that each column is also a normal Python instance attribute.
+class User(Base):
+    __tablename__ = 'user'
     id = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
+    username = Column(String(30), nullable=False)
+    name = Column(String(50), nullable=False)
+    email = Column(String(250), nullable=False)
+    password = Column(String(30), nullable=False)
+    pronouns = Column(String(30), nullable=True)
+    bio = Column(String(150), nullable=True)
+    gender = Column(String(10), nullable=True)
+    account_type = Column(String(30), nullable=True)
 
-class Address(Base):
-    __tablename__ = 'address'
-    # Here we define columns for the table address.
-    # Notice that each column is also a normal Python instance attribute.
+    def serialize(self):
+        return {
+            "username": self.username,
+            "name": self.name,
+            "pronouns": self.pronouns,
+            "bio": self.bio,
+            "gender": self.gender,
+            "account_type": self.account_type
+        }
+
+class Follower(Base):
+    __tablename__ = 'follower'
     id = Column(Integer, primary_key=True)
-    street_name = Column(String(250))
-    street_number = Column(String(250))
-    post_code = Column(String(250), nullable=False)
-    person_id = Column(Integer, ForeignKey('person.id'))
-    person = relationship(Person)
+    used_id = Column(Integer, ForeignKey("user.id"))
+    user = relationship(User)
 
-    def to_dict(self):
-        return {}
+    def serialize(self):
+        return {
+            "user_id": self.user_id,
+        }
+
+class Following(Base):
+    __tablename__ = 'following'
+    id = Column(Integer, primary_key=True)
+    used_id = Column(Integer, ForeignKey("user.id"))
+    user = relationship(User)
+
+    def serialize(self):
+        return {
+            "user_id": self.user_id,
+        }
+    
+class Post(Base):
+    __tablename__ = 'post'
+    id = Column(Integer, primary_key=True)
+    user = relationship(User)
+    user_id = Column(Integer, ForeignKey("user.id"))
+    image = Column(String(200), nullable=False)
+    description = Column(String(1000), nullable=False)
+    location = Column(String(75), nullable=True)
+    timestamp = Column(Integer, nullable=False)
+    visibility = Column(Integer, nullable=False)
+
+    def serialize(self):
+        return {
+            "image": self.image,
+            "description": self.description,
+            "location": self.location,
+            "timestamp": self.timestamp,
+            "visibility": self.visibility
+        }
+    
+class Like(Base):
+    __tablename__ = 'like'
+    id = Column(Integer, primary_key=True)
+    user = relationship(User)
+    post_id = Column(Integer, ForeignKey("post.id"))
+    
+    def serialize(self):
+        return {
+        }
+
+class Comment(Base):
+    __tablename__ = 'comment'
+    id = Column(Integer, primary_key=True)
+    user = relationship(User)
+    containing_post = Column(Integer, ForeignKey("post.id"))
+    containing_comment_id = Column(Integer, nullable=True)
+    timestamp = Column(Integer, nullable=False)
+    visibility = Column(Integer, nullable=False)
+    comment_content = Column(String(1000), nullable=False)
+
+    def serialize(self):
+        return {
+            "containing_comment_id": self.containing_comment_id,
+            "timestamp": self.timestamp,
+            "visibility": self.visibility,
+            "comment_content": self.comment_content
+        }
+
+class Share(Base):
+    __tablename__ = 'share'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("user.id"))
+    post_id = Column(Integer, ForeignKey("post.id"))
+    share_via = Column(String(50), nullable=False)
+    share_content = Column(String(1000), nullable=True)
+
+    def serialize(self):
+        return {
+            "share_via": self.share_via,
+            "share_content": self.share_content
+        }
+
 
 ## Draw from SQLAlchemy base
 try:
